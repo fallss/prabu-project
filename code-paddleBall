@@ -1,0 +1,106 @@
+import pygame
+import random
+
+# Inisialisasi pygame
+pygame.init()
+
+# Ukuran layar
+screen_width = 800
+screen_height = 600
+
+# Warna
+white = (255, 255, 255)
+black = (0, 0, 0)
+
+# Kecepatan
+ball_speed = [3, 3]
+paddle_speed = 6
+
+# Membuat layar
+screen = pygame.display.set_mode((screen_width, screen_height))
+pygame.display.set_caption("Enhanced Paddle Ball Game")
+
+# Memuat gambar
+background = pygame.image.load('c:\Users\IFHAL FAIZI\Downloads\OIG4.jpeg')
+paddle_img = pygame.image.load('c:/Users/IFHAL FAIZI/Downloads/Screenshot 2024-05-23 200351.png')
+ball_img = pygame.image.load('c:/Users/IFHAL FAIZI/Downloads/Screenshot 2024-05-23 200446.png')
+
+# Mengatur ukuran paddle dan bola
+paddle_img = pygame.transform.scale(paddle_img, (100, 20))
+ball_img = pygame.transform.scale(ball_img, (20, 20))
+
+# Membuat paddle
+paddle = paddle_img.get_rect(midbottom=(screen_width // 2, screen_height - 30))
+
+# Membuat bola
+ball = ball_img.get_rect(center=(screen_width // 2, screen_height // 2))
+
+# Memuat efek suara
+# bounce_sound = pygame.mixer.Sound('bounce.wav')
+
+# Skor
+score = 0
+
+# Font
+font = pygame.font.Font(None, 36)
+
+# Fungsi untuk menggambar objek di layar
+def draw_objects():
+    screen.blit(background, (0, 0))
+    screen.blit(paddle_img, paddle)
+    screen.blit(ball_img, ball)
+    score_text = font.render(f"Score: {score}", True, white)
+    screen.blit(score_text, (10, 10))
+    pygame.display.flip()
+
+# Loop permainan
+running = True
+clock = pygame.time.Clock()
+
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    # Mendapatkan input dari keyboard
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT] and paddle.left > 0:
+        paddle.left -= paddle_speed
+    if keys[pygame.K_RIGHT] and paddle.right < screen_width:
+        paddle.right += paddle_speed
+
+    # Memindahkan bola
+    ball.left += ball_speed[0]
+    ball.top += ball_speed[1]
+
+    # Memantulkan bola dari dinding
+    if ball.left <= 0 or ball.right >= screen_width:
+        ball_speed[0] = -ball_speed[0]
+        # bounce_sound.play()
+    if ball.top <= 0:
+        ball_speed[1] = -ball_speed[1]
+        # bounce_sound.play()
+
+    # Memantulkan bola dari paddle
+    if ball.colliderect(paddle):
+        ball_speed[1] = -ball_speed[1]
+        score += 1
+        # bounce_sound.play()
+
+    # Mengakhiri permainan jika bola jatuh
+    if ball.top >= screen_height:
+        running = False
+
+    draw_objects()
+    clock.tick(60)
+
+# Menampilkan pesan akhir
+screen.fill(black)
+game_over_text = font.render("Game Over", True, white)
+final_score_text = font.render(f"Final Score: {score}", True, white)
+screen.blit(game_over_text, (screen_width // 2 - game_over_text.get_width() // 2, screen_height // 2 - 50))
+screen.blit(final_score_text, (screen_width // 2 - final_score_text.get_width() // 2, screen_height // 2))
+pygame.display.flip()
+pygame.time.wait(3000)
+
+pygame.quit()
