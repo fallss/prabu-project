@@ -1,3 +1,5 @@
+// saya ifhal faizi pembuat game snake 
+
 import pygame
 import random
 
